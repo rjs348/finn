@@ -33,9 +33,10 @@ export interface AdminLoginData {
 }
 
 export const auth = {
-    studentLogin: (data: StudentLoginData) => api.post('/auth/student/login', data),
-    verifyOtp: (data: VerifyOtpData) => api.post('/auth/student/verify', data),
+    studentLogin: (data: StudentLoginData) => api.post('/auth/student/send-otp', data),
+    verifyOtp: (data: VerifyOtpData) => api.post('/auth/student/verify-otp', data),
     adminLogin: (data: AdminLoginData) => api.post('/auth/admin/login', data),
+    adminForgotPassword: (email: string) => api.post('/auth/admin/forgot-password', { email }),
 };
 
 export const candidates = {
@@ -51,6 +52,10 @@ export const vote = {
 export const admin = {
     getDashboard: () => api.get('/admin/dashboard'),
     toggleElection: () => api.put('/admin/election-status'),
+};
+
+export const election = {
+    getStatus: () => api.get('/election/status'),
 };
 
 export const chatbot = {

@@ -4,7 +4,7 @@ const { GoogleGenerativeAI } = require("@google/generative-ai");
 const router = express.Router();
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
 // POST /api/chat
 router.post("/", async (req, res) => {
@@ -31,10 +31,19 @@ router.post("/", async (req, res) => {
     const response = await result.response;
     const text = response.text();
 
+    console.log(`[CHATBOT] Successfully generated response for user message.`);
     res.json({ reply: text });
   } catch (error) {
-    console.error("Chat error:", error);
-    res.status(500).json({ error: "Chatbot is currently unavailable. Please try again later." });
+    if (error.status === 429 || error.message.includes("429")) {
+      console.warn("[CHATBOT WARNING] Quota exceeded (429). Advise user to wait.");
+      return res.status(429).json({ reply: "I'm a bit overwhelmed with questions right now! Please wait about 30 seconds and try again. 🕒" });
+    }
+
+    console.error("[CHATBOT ERROR] Detailed failure:", error.message);
+    if (error.status === 403) {
+      console.error("[CHATBOT ERROR] Potential API Key issue or invalid region.");
+    }
+    res.status(500).json({ error: "Chatbot is currently busy. Please try again in safe mode." });
   }
 });
 

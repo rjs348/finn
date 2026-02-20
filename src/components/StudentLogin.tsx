@@ -21,7 +21,6 @@ export function StudentLogin({ onLogin, onBack }: StudentLoginProps) {
       try {
         await auth.studentLogin({ name: studentName, rollNumber, registerNumber, email });
         setStep('otp');
-        alert('OTP sent to your email (Check console for demo)');
       } catch (error) {
         alert('Failed to send OTP. Please try again.');
         console.error(error);
@@ -36,7 +35,7 @@ export function StudentLogin({ onLogin, onBack }: StudentLoginProps) {
       localStorage.setItem('token', response.data.token);
       onLogin(rollNumber);
     } catch (error) {
-      alert('Invalid OTP. Please try again.');
+      alert('Invalid OTP or OTP expired. Please try again.');
       console.error(error);
     }
   };

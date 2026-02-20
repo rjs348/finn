@@ -1,73 +1,75 @@
-# React + TypeScript + Vite
+# NIT Online Voting System Setup Guide
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Complete source code for the College Election Voting System.
 
-Currently, two official plugins are available:
+## Features
+- **Student Authentication**: OTP-based login via email.
+- **Admin Control**: Manage candidates, view real-time vote counts, and control election status.
+- **Secure Voting**: Each student can vote only once with multiple checks.
+- **Security**: JWT authentication, Bcrypt password hashing, and OTP expiry (5 minutes).
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Prerequisites
+- Node.js installed.
+- MongoDB Atlas account (with a Connection URI).
+- Email account with App Password (for Nodemailer).
 
-## React Compiler
+## Backend Setup
+1. Open terminal in the `server` directory:
+   ```bash
+   cd server
+   ```
+2. Install dependencies:
+   ```bash
+   npm install express mongoose dotenv cors jsonwebtoken bcryptjs nodemailer @google/generative-ai
+   ```
+3. Configure Environment Variables (`.env`):
+   Create a `.env` file in the `server` folder:
+   ```env
+   PORT=5000
+   MONGO_URI="your_mongodb_atlas_uri"
+   JWT_SECRET="your_secure_random_string"
+   EMAIL_USER="your-email@gmail.com"
+   EMAIL_PASS="your-gmail-app-password"
+   GEMINI_API_KEY="your_api_key"
+   ```
+4. Run the server:
+   ```bash
+   npm run dev
+   ```
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Frontend Setup
+1. Open terminal in the root directory:
+   ```bash
+   cd ..
+   ```
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Run the development server:
+   ```bash
+   npm run dev
+   ```
 
-## Expanding the ESLint configuration
+## Default Admin Credentials
+- **Admin ID**: `admin`
+- **Password**: `admin123`
+- **Riya ID**: `riya`
+- **Riya Password**: `riya123`
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## API Endpoints
+### Authentication
+- `POST /api/auth/student/send-otp`: Sends 6-digit OTP to student email.
+- `POST /api/auth/student/verify-otp`: Verifies OTP and returns JWT.
+- `POST /api/auth/admin/login`: Admin login.
+- `POST /api/auth/admin/forgot-password`: Simulates sending reset link.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+### Voting
+- `POST /api/vote`: Cast a vote (Requires Student JWT).
+- `GET /api/candidates`: Get all active candidates.
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
-
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+### Admin
+- `GET /api/admin/dashboard`: View total students and vote logs.
+- `POST /api/candidates`: Add new candidate.
+- `DELETE /api/candidates/:id`: Remove candidate.
+- `PUT /api/admin/election-status`: Open/Close voting.

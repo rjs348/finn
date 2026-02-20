@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { LogOut, Vote, CheckCircle2, XCircle } from 'lucide-react';
-import { admin } from '../api';
+import { election } from '../api';
 
 interface Student {
   name: string;
@@ -24,8 +24,8 @@ export function StudentDashboard({
 
   const fetchStatus = async () => {
     try {
-      const response = await admin.getDashboard(); // We can use the same endpoint to get status
-      setElectionStatus(response.data.electionStatus);
+      const response = await election.getStatus();
+      setElectionStatus(response.data.status);
     } catch (error) {
       console.error('Error fetching election status:', error);
     }

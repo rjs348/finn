@@ -53,11 +53,12 @@ export function Chatbot() {
         timestamp: new Date()
       };
       setMessages(prev => [...prev, botMessage]);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Chatbot error:', error);
+      const errorMessage = error.response?.data?.reply || error.response?.data?.error || "Sorry, I'm having trouble connecting to my brain right now.";
       setMessages(prev => [...prev, {
         id: (Date.now() + 1).toString(),
-        text: "Sorry, I'm having trouble connecting to my brain right now.",
+        text: errorMessage,
         sender: 'bot',
         timestamp: new Date()
       }]);

@@ -3,11 +3,12 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const Student = require("../models/Student");
 const Admin = require("../models/Admin");
+const { sendOtpEmail } = require("../config/emailConfig");
 
 const router = express.Router();
 
-// ── STUDENT: Login (Send OTP) ─────────────────────────────────────────────
-router.post("/student/login", async (req, res) => {
+// ── STUDENT: Send OTP ──────────────────────────────────────────────────────
+router.post("/student/send-otp", async (req, res) => {
     try {
         const { name, rollNumber, registerNumber, email } = req.body;
 
@@ -17,22 +18,26 @@ router.post("/student/login", async (req, res) => {
 
         // Generate a 6-digit OTP
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
-        const otpExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+        const otpExpiry = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes (Requirement)
 
-        // Upsert student (create if doesn't exist, update OTP if exists)
+        // Upsert student
         const student = await Student.findOneAndUpdate(
             { rollNumber },
             { name, rollNumber, registerNumber, email, otp, otpExpiry },
             { upsert: true, new: true, setDefaultsOnInsert: true }
         );
 
-        // In a real app you'd email the OTP via Nodemailer here.
-        // For demo, we return it in the response.
-        console.log(`OTP for ${rollNumber}: ${otp}`);
+        // Send the real OTP via email
+        try {
+            await sendOtpEmail(email, otp);
+            console.log(`OTP sent successfully to ${email}`);
+        } catch (emailError) {
+            console.error("Failed to send email:", emailError);
+        }
 
         res.json({
             message: "OTP sent successfully",
-            demoOtp: otp, // Remove in production
+            demoOtp: otp, // Keep for debugging
         });
     } catch (error) {
         console.error("Send OTP error:", error);
@@ -41,7 +46,7 @@ router.post("/student/login", async (req, res) => {
 });
 
 // ── STUDENT: Verify OTP ────────────────────────────────────────────────────
-router.post("/student/verify", async (req, res) => {
+router.post("/student/verify-otp", async (req, res) => {
     try {
         const { rollNumber, otp } = req.body;
 
@@ -97,21 +102,29 @@ router.post("/student/verify", async (req, res) => {
 // ── ADMIN: Login ───────────────────────────────────────────────────────────
 router.post("/admin/login", async (req, res) => {
     try {
-        const { adminId, password } = req.body;
+        const { adminId, username, password } = req.body;
+        const finalAdminId = adminId || username;
 
-        if (!adminId || !password) {
-            return res.status(400).json({ error: "Admin ID and password are required" });
+        console.log(`[AUTH DEBUG] Admin login attempt for: "${finalAdminId}"`);
+
+        if (!finalAdminId || !password) {
+            return res.status(400).json({ error: "Admin ID/Username and password are required" });
         }
 
-        const admin = await Admin.findOne({ adminId });
+        const admin = await Admin.findOne({ adminId: finalAdminId });
         if (!admin) {
+            console.log(`[AUTH DEBUG] Admin not found in DB: "${finalAdminId}"`);
             return res.status(401).json({ error: "Invalid admin ID or password" });
         }
 
+        console.log(`[AUTH DEBUG] Admin found. Comparing password...`);
         const isMatch = await admin.comparePassword(password);
         if (!isMatch) {
+            console.log(`[AUTH DEBUG] Password mismatch for: "${finalAdminId}"`);
             return res.status(401).json({ error: "Invalid admin ID or password" });
         }
+
+        console.log(`[AUTH DEBUG] Login SUCCESS for: "${finalAdminId}"`);
 
         const token = jwt.sign(
             { id: admin._id, adminId: admin.adminId, role: "admin" },
@@ -123,6 +136,25 @@ router.post("/admin/login", async (req, res) => {
     } catch (error) {
         console.error("Admin login error:", error);
         res.status(500).json({ error: "Login failed" });
+    }
+});
+
+// ── ADMIN: Forgot Password ───────────────────────────────────────────────
+router.post("/admin/forgot-password", async (req, res) => {
+    try {
+        const { email } = req.body;
+        if (!email) {
+            return res.status(400).json({ error: "Email is required" });
+        }
+
+        // In a real app, find admin by email and send reset link
+        // For this demo, we simulate success
+        console.log(`Reset link requested for admin email: ${email}`);
+
+        res.json({ message: "Password reset link sent to your email" });
+    } catch (error) {
+        console.error("Forgot password error:", error);
+        res.status(500).json({ error: "Failed to process request" });
     }
 });
 

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { LandingPage } from './components/LandingPage';
 import { StudentLogin } from './components/StudentLogin';
@@ -11,37 +11,17 @@ import { ManageCandidates } from './components/ManageCandidates';
 import { SuccessPage } from './components/SuccessPage';
 import { Chatbot } from './components/Chatbot';
 
+import { OTPVerification } from './components/OTPVerification';
+
 // Define types locally
 export type ElectionStatus = 'open' | 'closed';
 
 interface User {
-    rollNumber: string;
+    rollNo: string;
     name: string;
     role: string;
     hasVoted?: boolean;
 }
-
-const BackgroundStars = () => {
-    return (
-        <div className="stars-container">
-            {[...Array(50)].map((_, i) => (
-                <div
-                    key={i}
-                    className="star"
-                    style={{
-                        left: `${Math.random() * 100}%`,
-                        top: `${Math.random() * 100}%`,
-                        width: `${Math.random() * 3}px`,
-                        height: `${Math.random() * 3}px`,
-                        '--duration': `${2 + Math.random() * 4}s`,
-                    } as any}
-                />
-            ))}
-            <div className="shooting-star" style={{ top: '10%', left: '30%', animationDelay: '2s' }}></div>
-            <div className="shooting-star" style={{ top: '5%', left: '80%', animationDelay: '4s' }}></div>
-        </div>
-    );
-};
 
 function AppContent() {
     const [user, setUser] = useState<User | null>(() => {
@@ -55,8 +35,13 @@ function AppContent() {
     });
     const navigate = useNavigate();
 
-    const handleStudentLogin = (rollNumber: string) => {
-        const newUser: User = { rollNumber, name: 'Student', role: 'student' };
+    const handleStudentLogin = (rollNo: string, studentData: any) => {
+        const newUser: User = {
+            rollNo,
+            name: studentData.name || 'Student',
+            role: 'student',
+            hasVoted: studentData.hasVoted
+        };
         setUser(newUser);
         localStorage.setItem('user', JSON.stringify(newUser));
         navigate('/student/dashboard');
@@ -75,13 +60,8 @@ function AppContent() {
         navigate('/');
     };
 
-    useEffect(() => {
-        // Just for logging or other side effects if needed
-    }, []);
-
     return (
         <div className="min-h-screen">
-            <BackgroundStars />
             <Routes>
                 <Route path="/" element={
                     <LandingPage
@@ -92,8 +72,13 @@ function AppContent() {
 
                 <Route path="/student/login" element={
                     <StudentLogin
-                        onLogin={handleStudentLogin}
                         onBack={() => navigate('/')}
+                    />
+                } />
+
+                <Route path="/student/verify-otp" element={
+                    <OTPVerification
+                        onLogin={handleStudentLogin}
                     />
                 } />
 

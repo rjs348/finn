@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ArrowLeft, Lock, Shield, Mail, AlertCircle } from 'lucide-react';
+import { ArrowLeft, Lock, Shield, Mail, AlertCircle, Eye, EyeOff } from 'lucide-react';
 import { auth } from '../api';
 
 interface AdminLoginProps {
@@ -10,6 +10,7 @@ interface AdminLoginProps {
 export function AdminLogin({ onLogin, onBack }: AdminLoginProps) {
   const [adminId, setAdminId] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [resetEmail, setResetEmail] = useState('');
   const [resetSent, setResetSent] = useState(false);
@@ -32,16 +33,22 @@ export function AdminLogin({ onLogin, onBack }: AdminLoginProps) {
     }
   };
 
-  const handleForgotPassword = (e: React.FormEvent) => {
+  const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError('');
     if (resetEmail) {
-      // Simulate sending password reset email
-      setResetSent(true);
-      setTimeout(() => {
-        setResetSent(false);
-        setShowForgotPassword(false);
-        setResetEmail('');
-      }, 3000);
+      try {
+        await auth.adminForgotPassword(resetEmail);
+        setResetSent(true);
+        setTimeout(() => {
+          setResetSent(false);
+          setShowForgotPassword(false);
+          setResetEmail('');
+        }, 3000);
+      } catch (err) {
+        setError('Failed to send reset link. Please try again.');
+        console.error(err);
+      }
     }
   };
 
@@ -169,13 +176,20 @@ export function AdminLogin({ onLogin, onBack }: AdminLoginProps) {
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter password"
-                className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+                className="w-full pl-11 pr-12 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
                 required
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none"
+              >
+                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+              </button>
             </div>
             <div className="text-right mt-2">
               <button
