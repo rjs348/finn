@@ -1,0 +1,148 @@
+﻿
+> vite-project@0.0.0 lint
+> eslint .
+
+
+C:\Users\Hima Saila\Desktop\fin\vite-project\src\App.tsx
+  25:38  error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                @typescript-eslint/no-explicit-any
+  54:17  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\Hima Saila\Desktop\fin\vite-project\src\App.tsx:54:17
+  52 |         if (token) {
+  53 |             if (savedUser) {
+> 54 |                 setUser(JSON.parse(savedUser));
+     |                 ^^^^^^^ Avoid calling setState() directly within an effect
+  55 |             } else {
+  56 |                 // Assume admin if token exists but no user object (simplified)
+  57 |                 setIsAdmin(true);  react-hooks/set-state-in-effect
+
+C:\Users\Hima Saila\Desktop\fin\vite-project\src\api.ts
+  19:26  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  20:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  21:24  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  26:17  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\Hima Saila\Desktop\fin\vite-project\src\components\AdminDashboard.tsx
+  40:5  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\Hima Saila\Desktop\fin\vite-project\src\components\AdminDashboard.tsx:40:5
+  38 |
+  39 |   useEffect(() => {
+> 40 |     fetchStats();
+     |     ^^^^^^^^^^ Avoid calling setState() directly within an effect
+  41 |   }, []);
+  42 |
+  43 |   const handleToggleElection = async () => {  react-hooks/set-state-in-effect
+
+C:\Users\Hima Saila\Desktop\fin\vite-project\src\components\Chatbot.tsx
+  56:14  error  'error' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\Hima Saila\Desktop\fin\vite-project\src\components\ManageCandidates.tsx
+  34:45  error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            @typescript-eslint/no-explicit-any
+  34:53  error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            @typescript-eslint/no-explicit-any
+  43:5   error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\Hima Saila\Desktop\fin\vite-project\src\components\ManageCandidates.tsx:43:5
+  41 |
+  42 |   useEffect(() => {
+> 43 |     fetchCandidates();
+     |     ^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  44 |   }, []);
+  45 |
+  46 |   const handleAddCandidate = async (e: React.FormEvent) => {  react-hooks/set-state-in-effect
+
+C:\Users\Hima Saila\Desktop\fin\vite-project\src\components\ResultsPage.tsx
+  25:45  error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       @typescript-eslint/no-explicit-any
+  25:53  error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       @typescript-eslint/no-explicit-any
+  33:5   error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\Hima Saila\Desktop\fin\vite-project\src\components\ResultsPage.tsx:33:5
+  31 |
+  32 |   useEffect(() => {
+> 33 |     fetchResults();
+     |     ^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  34 |   }, []);
+  35 |
+  36 |   const totalVotes = candidates.reduce((acc, curr) => acc + (curr.votes || 0), 0);  react-hooks/set-state-in-effect
+
+C:\Users\Hima Saila\Desktop\fin\vite-project\src\components\StudentDashboard.tsx
+  35:5  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\Hima Saila\Desktop\fin\vite-project\src\components\StudentDashboard.tsx:35:5
+  33 |
+  34 |   useEffect(() => {
+> 35 |     fetchStatus();
+     |     ^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  36 |     // In a real app, we'd also fetch the latest student status from backend
+  37 |   }, []);
+  38 |  react-hooks/set-state-in-effect
+
+C:\Users\Hima Saila\Desktop\fin\vite-project\src\components\VotingPage.tsx
+  36:5   error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\Hima Saila\Desktop\fin\vite-project\src\components\VotingPage.tsx:36:5
+  34 |
+  35 |   useEffect(() => {
+> 36 |     fetchCandidates();
+     |     ^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  37 |     // Check if user has voted (could be part of user profile or a separate check)
+  38 |     // For now, assuming if we get a 403 or specific error on vote it means voted
+  39 |     // Or we can check user state if we had a global context  react-hooks/set-state-in-effect
+  60:21  error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+
+C:\Users\Hima Saila\Desktop\fin\vite-project\src\components\ui\badge.tsx
+  46:17  error  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+C:\Users\Hima Saila\Desktop\fin\vite-project\src\components\ui\button.tsx
+  58:18  error  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+C:\Users\Hima Saila\Desktop\fin\vite-project\src\components\ui\form.tsx
+  160:3  error  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+C:\Users\Hima Saila\Desktop\fin\vite-project\src\components\ui\navigation-menu.tsx
+  167:3  error  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+C:\Users\Hima Saila\Desktop\fin\vite-project\src\components\ui\sidebar.tsx
+  723:3  error  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+C:\Users\Hima Saila\Desktop\fin\vite-project\src\components\ui\toggle.tsx
+  47:18  error  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+Γ£û 23 problems (23 errors, 0 warnings)
+

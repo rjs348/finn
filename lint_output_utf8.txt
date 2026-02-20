@@ -1,0 +1,271 @@
+﻿
+> vite-project@0.0.0 lint
+> eslint .
+
+
+C:\Users\Hima Saila\Desktop\fin\vite-project\src\App.tsx
+  18:38  error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                @typescript-eslint/no-explicit-any
+  27:17  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\Hima Saila\Desktop\fin\vite-project\src\App.tsx:27:17
+  25 |         if (token) {
+  26 |             if (savedUser) {
+> 27 |                 setUser(JSON.parse(savedUser));
+     |                 ^^^^^^^ Avoid calling setState() directly within an effect
+  28 |             } else {
+  29 |                 // Assume admin if token exists but no user object (simplified)
+  30 |                 setIsAdmin(true);  react-hooks/set-state-in-effect
+
+C:\Users\Hima Saila\Desktop\fin\vite-project\src\api.ts
+  19:26  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  20:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  21:24  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  26:17  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\Hima Saila\Desktop\fin\vite-project\src\components\AdminDashboard.tsx
+  12:10  error  'useNavigate' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 @typescript-eslint/no-unused-vars
+  30:5   error  Error: Cannot access variable before it is declared
+
+`fetchStats` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+C:\Users\Hima Saila\Desktop\fin\vite-project\src\components\AdminDashboard.tsx:30:5
+  28 |
+  29 |   useEffect(() => {
+> 30 |     fetchStats();
+     |     ^^^^^^^^^^ `fetchStats` accessed before it is declared
+  31 |   }, []);
+  32 |
+  33 |   const fetchStats = async () => {
+
+C:\Users\Hima Saila\Desktop\fin\vite-project\src\components\AdminDashboard.tsx:33:3
+  31 |   }, []);
+  32 |
+> 33 |   const fetchStats = async () => {
+     |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 34 |     try {
+     | ^^^^^^^^^
+> 35 |       const response = await admin.getDashboard();
+     | ^^^^^^^^^
+> 36 |       setElectionStatus(response.data.electionStatus);
+     | ^^^^^^^^^
+> 37 |       setTotalVotes(response.data.totalVotes);
+     | ^^^^^^^^^
+> 38 |       setTotalCandidates(response.data.totalCandidates);
+     | ^^^^^^^^^
+> 39 |     } catch (error) {
+     | ^^^^^^^^^
+> 40 |       console.error('Error fetching dashboard stats:', error);
+     | ^^^^^^^^^
+> 41 |     }
+     | ^^^^^^^^^
+> 42 |   };
+     | ^^^^^ `fetchStats` is declared here
+  43 |
+  44 |   const handleToggleElection = async () => {
+  45 |     try {  react-hooks/immutability
+
+C:\Users\Hima Saila\Desktop\fin\vite-project\src\components\Chatbot.tsx
+  56:14  error  'error' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\Hima Saila\Desktop\fin\vite-project\src\components\ManageCandidates.tsx
+  31:5   error  Error: Cannot access variable before it is declared
+
+`fetchCandidates` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+C:\Users\Hima Saila\Desktop\fin\vite-project\src\components\ManageCandidates.tsx:31:5
+  29 |
+  30 |   useEffect(() => {
+> 31 |     fetchCandidates();
+     |     ^^^^^^^^^^^^^^^ `fetchCandidates` accessed before it is declared
+  32 |   }, []);
+  33 |
+  34 |   const fetchCandidates = async () => {
+
+C:\Users\Hima Saila\Desktop\fin\vite-project\src\components\ManageCandidates.tsx:34:3
+  32 |   }, []);
+  33 |
+> 34 |   const fetchCandidates = async () => {
+     |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 35 |     try {
+     | ^^^^^^^^^
+> 36 |       const response = await candidatesApi.getAll();
+     ΓÇª
+     | ^^^^^^^^^
+> 43 |     }
+     | ^^^^^^^^^
+> 44 |   };
+     | ^^^^^ `fetchCandidates` is declared here
+  45 |
+  46 |   const handleAddCandidate = async (e: React.FormEvent) => {
+  47 |     e.preventDefault();  react-hooks/immutability
+  38:45  error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       @typescript-eslint/no-explicit-any
+  38:53  error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       @typescript-eslint/no-explicit-any
+
+C:\Users\Hima Saila\Desktop\fin\vite-project\src\components\ResultsPage.tsx
+  22:5   error  Error: Cannot access variable before it is declared
+
+`fetchResults` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+C:\Users\Hima Saila\Desktop\fin\vite-project\src\components\ResultsPage.tsx:22:5
+  20 |
+  21 |   useEffect(() => {
+> 22 |     fetchResults();
+     |     ^^^^^^^^^^^^ `fetchResults` accessed before it is declared
+  23 |   }, []);
+  24 |
+  25 |   const fetchResults = async () => {
+
+C:\Users\Hima Saila\Desktop\fin\vite-project\src\components\ResultsPage.tsx:25:3
+  23 |   }, []);
+  24 |
+> 25 |   const fetchResults = async () => {
+     |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 26 |     try {
+     | ^^^^^^^^^
+> 27 |       const response = await candidatesApi.getAll();
+     | ^^^^^^^^^
+> 28 |       // Sort by vote count desc
+     | ^^^^^^^^^
+> 29 |       const sorted = response.data.sort((a: any, b: any) => (b.votes || 0) - (a.votes || 0));
+     | ^^^^^^^^^
+> 30 |       setCandidates(sorted);
+     | ^^^^^^^^^
+> 31 |     } catch (err) {
+     | ^^^^^^^^^
+> 32 |       console.error(err);
+     | ^^^^^^^^^
+> 33 |     }
+     | ^^^^^^^^^
+> 34 |   };
+     | ^^^^^ `fetchResults` is declared here
+  35 |
+  36 |   const totalVotes = candidates.reduce((acc, curr) => acc + (curr.votes || 0), 0);
+  37 |   const winner = candidates[0];  react-hooks/immutability
+  29:45  error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              @typescript-eslint/no-explicit-any
+  29:53  error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              @typescript-eslint/no-explicit-any
+
+C:\Users\Hima Saila\Desktop\fin\vite-project\src\components\StudentDashboard.tsx
+  23:19  error  'setStudent' is assigned a value but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               @typescript-eslint/no-unused-vars
+  26:5   error  Error: Cannot access variable before it is declared
+
+`fetchStatus` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+C:\Users\Hima Saila\Desktop\fin\vite-project\src\components\StudentDashboard.tsx:26:5
+  24 |
+  25 |   useEffect(() => {
+> 26 |     fetchStatus();
+     |     ^^^^^^^^^^^ `fetchStatus` accessed before it is declared
+  27 |     // In a real app, we'd also fetch the latest student status from backend
+  28 |   }, []);
+  29 |
+
+C:\Users\Hima Saila\Desktop\fin\vite-project\src\components\StudentDashboard.tsx:30:3
+  28 |   }, []);
+  29 |
+> 30 |   const fetchStatus = async () => {
+     |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 31 |     try {
+     | ^^^^^^^^^
+> 32 |       const response = await admin.getDashboard(); // We can use the same endpoint to get status
+     | ^^^^^^^^^
+> 33 |       setElectionStatus(response.data.electionStatus);
+     | ^^^^^^^^^
+> 34 |     } catch (error) {
+     | ^^^^^^^^^
+> 35 |       console.error('Error fetching election status:', error);
+     | ^^^^^^^^^
+> 36 |     }
+     | ^^^^^^^^^
+> 37 |   };
+     | ^^^^^ `fetchStatus` is declared here
+  38 |
+  39 |   const canVote = electionStatus === 'open' && !student.hasVoted;
+  40 |  react-hooks/immutability
+
+C:\Users\Hima Saila\Desktop\fin\vite-project\src\components\StudentLogin.tsx
+  17:10  error  'sentOtp' is assigned a value but never used     @typescript-eslint/no-unused-vars
+  17:19  error  'setSentOtp' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\Hima Saila\Desktop\fin\vite-project\src\components\SuccessPage.tsx
+  1:10  error  'useNavigate' is defined but never used  @typescript-eslint/no-unused-vars
+  2:29  error  'ArrowRight' is defined but never used   @typescript-eslint/no-unused-vars
+
+C:\Users\Hima Saila\Desktop\fin\vite-project\src\components\VotingPage.tsx
+   2:34  error  'AlertCircle' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              @typescript-eslint/no-unused-vars
+  26:5   error  Error: Cannot access variable before it is declared
+
+`fetchCandidates` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+C:\Users\Hima Saila\Desktop\fin\vite-project\src\components\VotingPage.tsx:26:5
+  24 |
+  25 |   useEffect(() => {
+> 26 |     fetchCandidates();
+     |     ^^^^^^^^^^^^^^^ `fetchCandidates` accessed before it is declared
+  27 |     // Check if user has voted (could be part of user profile or a separate check)
+  28 |     // For now, assuming if we get a 403 or specific error on vote it means voted
+  29 |     // Or we can check user state if we had a global context
+
+C:\Users\Hima Saila\Desktop\fin\vite-project\src\components\VotingPage.tsx:37:3
+  35 |   }, []);
+  36 |
+> 37 |   const fetchCandidates = async () => {
+     |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 38 |     try {
+     | ^^^^^^^^^
+> 39 |       const response = await candidatesApi.getAll();
+     | ^^^^^^^^^
+> 40 |       setCandidates(response.data);
+     | ^^^^^^^^^
+> 41 |     } catch (err) {
+     | ^^^^^^^^^
+> 42 |       console.error('Error fetching candidates:', err);
+     | ^^^^^^^^^
+> 43 |       setError('Failed to load candidates.');
+     | ^^^^^^^^^
+> 44 |     }
+     | ^^^^^^^^^
+> 45 |   };
+     | ^^^^^ `fetchCandidates` is declared here
+  46 |
+  47 |   const handleVote = async () => {
+  48 |     if (selectedCandidate) {  react-hooks/immutability
+  60:21  error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             @typescript-eslint/no-explicit-any
+
+C:\Users\Hima Saila\Desktop\fin\vite-project\src\components\ui\badge.tsx
+  46:17  error  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+C:\Users\Hima Saila\Desktop\fin\vite-project\src\components\ui\button.tsx
+  58:18  error  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+C:\Users\Hima Saila\Desktop\fin\vite-project\src\components\ui\form.tsx
+  160:3  error  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+C:\Users\Hima Saila\Desktop\fin\vite-project\src\components\ui\navigation-menu.tsx
+  167:3  error  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+C:\Users\Hima Saila\Desktop\fin\vite-project\src\components\ui\sidebar.tsx
+  611:26  error  Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+C:\Users\Hima Saila\Desktop\fin\vite-project\src\components\ui\sidebar.tsx:611:26
+  609 |   // Random width between 50 to 90%.
+  610 |   const width = React.useMemo(() => {
+> 611 |     return `${Math.floor(Math.random() * 40) + 50}%`;
+      |                          ^^^^^^^^^^^^^ Cannot call impure function
+  612 |   }, []);
+  613 |
+  614 |   return (  react-hooks/purity
+  725:3   error  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        react-refresh/only-export-components
+
+C:\Users\Hima Saila\Desktop\fin\vite-project\src\components\ui\toggle.tsx
+  47:18  error  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+Γ£û 31 problems (31 errors, 0 warnings)
+

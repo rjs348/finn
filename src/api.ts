@@ -1,0 +1,60 @@
+import axios from 'axios';
+
+const API_URL = 'http://localhost:5000/api';
+
+const api = axios.create({
+    baseURL: API_URL,
+});
+
+// Interceptor to add token
+api.interceptors.request.use((config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+});
+
+export interface StudentLoginData {
+    name: string;
+    rollNumber: string;
+    registerNumber: string;
+    email: string;
+}
+
+export interface VerifyOtpData {
+    rollNumber: string;
+    otp: string;
+}
+
+export interface AdminLoginData {
+    username: string;
+    password: string;
+}
+
+export const auth = {
+    studentLogin: (data: StudentLoginData) => api.post('/auth/student/login', data),
+    verifyOtp: (data: VerifyOtpData) => api.post('/auth/student/verify', data),
+    adminLogin: (data: AdminLoginData) => api.post('/auth/admin/login', data),
+};
+
+export const candidates = {
+    getAll: () => api.get('/candidates'),
+    add: (data: FormData | object) => api.post('/candidates', data),
+    delete: (id: string) => api.delete(`/candidates/${id}`),
+};
+
+export const vote = {
+    cast: (candidateId: string) => api.post('/vote', { candidateId }),
+};
+
+export const admin = {
+    getDashboard: () => api.get('/admin/dashboard'),
+    toggleElection: () => api.put('/admin/election-status'),
+};
+
+export const chatbot = {
+    message: (message: string) => api.post('/chatbot', { message }),
+};
+
+export default api;
