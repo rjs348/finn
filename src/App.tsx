@@ -10,6 +10,7 @@ import { ResultsPage } from './components/ResultsPage';
 import { ManageCandidates } from './components/ManageCandidates';
 import { SuccessPage } from './components/SuccessPage';
 import { Chatbot } from './components/Chatbot';
+import { ResetPassword } from './components/ResetPassword';
 
 // Define types locally
 export type ElectionStatus = 'open' | 'closed';
@@ -55,10 +56,9 @@ function AppContent() {
     });
     const navigate = useNavigate();
 
-    const handleStudentLogin = (rollNumber: string) => {
-        const newUser: User = { rollNumber, name: 'Student', role: 'student' };
-        setUser(newUser);
-        localStorage.setItem('user', JSON.stringify(newUser));
+    const handleStudentLogin = (userData: User) => {
+        setUser(userData);
+        localStorage.setItem('user', JSON.stringify(userData));
         navigate('/student/dashboard');
     };
 
@@ -127,6 +127,7 @@ function AppContent() {
                 <Route path="/vote" element={<VotingPage />} />
                 <Route path="/results" element={<ResultsPage />} />
                 <Route path="/admin/candidates" element={<ManageCandidates />} />
+                <Route path="/admin/reset-password/:token" element={<ResetPassword />} />
                 <Route path="/success" element={<SuccessPage onBackToDashboard={() => navigate('/student/dashboard')} />} />
             </Routes>
             <Chatbot />

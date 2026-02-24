@@ -6,9 +6,7 @@ import { useNavigate } from 'react-router-dom';
 interface Candidate {
   _id: string;
   name: string;
-  rollNumber: string;
   course: string;
-  year: string;
   manifesto: string;
   photo?: string;
   votes?: number;
@@ -159,7 +157,7 @@ export function VotingPage() {
 
               <div className="flex-1">
                 <h3 className="text-lg mb-1">{candidate.name}</h3>
-                <p className="text-gray-600 text-sm">{candidate.course} - {candidate.year}</p>
+                <p className="text-gray-600 text-sm">{candidate.course}</p>
               </div>
 
               <div className="flex-shrink-0">

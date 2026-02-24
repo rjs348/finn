@@ -3,10 +3,7 @@ const mongoose = require("mongoose");
 const candidateSchema = new mongoose.Schema(
     {
         name: { type: String, required: true, trim: true },
-        rollNumber: { type: String, required: true, unique: true, trim: true },
         course: { type: String, required: true, trim: true },
-        year: { type: String, required: true, trim: true },
-        manifesto: { type: String, required: true, trim: true },
         photo: {
             type: String,
             default:

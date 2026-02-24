@@ -1,14 +1,19 @@
 import { useState, useEffect } from 'react';
-import { ArrowLeft, Trophy, BarChart3, Download } from 'lucide-react';
+import { ArrowLeft, Trophy, BarChart3, Download, CheckCircle2 } from 'lucide-react';
 import { candidates as candidatesApi } from '../api';
 import { useNavigate } from 'react-router-dom';
+
+import {
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
+  PieChart, Pie, Cell
+} from 'recharts';
+
+const COLORS = ['#6366f1', '#8b5cf6', '#ec4899', '#f43f5e', '#f59e0b', '#10b981', '#06b6d4'];
 
 interface Candidate {
   _id: string;
   name: string;
-  rollNumber: string;
   course: string;
-  year: string;
   manifesto: string;
   photo?: string;
   votes?: number;
@@ -36,6 +41,40 @@ export function ResultsPage() {
   const totalVotes = candidates.reduce((acc, curr) => acc + (curr.votes || 0), 0);
   const winner = candidates[0];
 
+  const handleExport = () => {
+    if (candidates.length === 0) return;
+
+    const headers = ["Rank", "Candidate Name", "Department", "Votes"];
+    const rows = candidates.map((c, index) => [
+      index + 1,
+      c.name,
+      c.course,
+      c.votes || 0
+    ]);
+
+    const csvContent = [
+      headers.join(","),
+      ...rows.map(row => row.join(","))
+    ].join("\n");
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `election_results_${new Date().toLocaleDateString()}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  // Prepare data for charts
+  const chartData = candidates.map(c => ({
+    name: c.name,
+    votes: c.votes || 0,
+    shortName: c.name.split(' ')[0]
+  }));
+
   return (
     <div className="min-h-screen p-6">
       <div className="max-w-6xl mx-auto">
@@ -48,7 +87,10 @@ export function ResultsPage() {
               <ArrowLeft className="w-5 h-5 mr-2" />
               Back to Dashboard
             </button>
-            <button className="flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium">
+            <button
+              onClick={handleExport}
+              className="flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium"
+            >
               <Download className="w-5 h-5" />
               Export Results
             </button>
@@ -56,7 +98,7 @@ export function ResultsPage() {
 
           <div className="text-center mb-8">
             <h1 className="text-3xl mb-2">Election Results</h1>
-            <p className="text-gray-600">Live voting statistics</p>
+            <p className="text-gray-600">Live voting statistics and visualizations</p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-6 mb-8">
@@ -124,6 +166,65 @@ export function ResultsPage() {
             ))}
           </div>
         </div>
+
+        {/* Visual Analytics Section */}
+        {candidates.length > 0 && (
+          <div className="grid lg:grid-cols-2 gap-6 mt-8">
+            <div className="bg-white rounded-2xl shadow-lg p-6">
+              <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
+                <BarChart3 className="w-5 h-5 text-blue-600" />
+                Vote Distribution (Bar)
+              </h2>
+              <div className="h-[300px] w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={chartData}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                    <XAxis dataKey="shortName" />
+                    <YAxis />
+                    <Tooltip
+                      contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                    />
+                    <Bar dataKey="votes" radius={[4, 4, 0, 0]}>
+                      {chartData.map((_entry, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-2xl shadow-lg p-6">
+              <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
+                <CheckCircle2 className="w-5 h-5 text-purple-600" />
+                Vote Percentage (Pie)
+              </h2>
+              <div className="h-[300px] w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={chartData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={60}
+                      outerRadius={100}
+                      paddingAngle={5}
+                      dataKey="votes"
+                    >
+                      {chartData.map((_entry, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip
+                      contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                    />
+                    <Legend verticalAlign="bottom" height={36} />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -25,6 +25,11 @@ export function AdminLogin({ onLogin, onBack }: AdminLoginProps) {
       if (adminId && password) {
         const response = await auth.adminLogin({ username: adminId, password });
         localStorage.setItem('token', response.data.token);
+        // Clear login details
+        setAdminId('');
+        setPassword('');
+        setError('');
+        setShowPassword(false);
         onLogin();
       }
     } catch (err) {
@@ -114,11 +119,6 @@ export function AdminLogin({ onLogin, onBack }: AdminLoginProps) {
             </form>
           )}
 
-          <div className="mt-6 text-center">
-            <p className="text-sm text-gray-600">
-              Demo: Enter any email to simulate password reset
-            </p>
-          </div>
         </div>
       </div>
     );
@@ -145,7 +145,7 @@ export function AdminLogin({ onLogin, onBack }: AdminLoginProps) {
           <p className="text-gray-600">Secure access for administrators</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6" autoComplete="off">
           {error && (
             <div className="bg-red-50 text-red-600 p-3 rounded-lg flex items-center gap-2">
               <AlertCircle className="w-5 h-5" />
@@ -165,6 +165,7 @@ export function AdminLogin({ onLogin, onBack }: AdminLoginProps) {
                 placeholder="Enter admin ID"
                 className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
                 required
+                autoComplete="off"
               />
             </div>
           </div>
@@ -182,6 +183,7 @@ export function AdminLogin({ onLogin, onBack }: AdminLoginProps) {
                 placeholder="Enter password"
                 className="w-full pl-11 pr-12 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
                 required
+                autoComplete="new-password"
               />
               <button
                 type="button"
@@ -210,11 +212,6 @@ export function AdminLogin({ onLogin, onBack }: AdminLoginProps) {
           </button>
         </form>
 
-        <div className="mt-6 text-center">
-          <p className="text-sm text-gray-600">
-            Demo: Use any admin ID and password
-          </p>
-        </div>
       </div>
     </div>
   );

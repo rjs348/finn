@@ -4,10 +4,10 @@ const { requireAdmin } = require("../middleware/auth");
 
 const router = express.Router();
 
-// GET all candidates (public)
+// GET active candidates (public/students)
 router.get("/", async (req, res) => {
     try {
-        const candidates = await Candidate.find().sort({ createdAt: 1 });
+        const candidates = await Candidate.find({ status: "active" }).sort({ createdAt: 1 });
         res.json(candidates);
     } catch (error) {
         console.error("Get candidates error:", error);
@@ -15,25 +15,34 @@ router.get("/", async (req, res) => {
     }
 });
 
+// GET all candidates (admin only)
+router.get("/all", requireAdmin, async (req, res) => {
+    try {
+        const candidates = await Candidate.find().sort({ createdAt: 1 });
+        res.json(candidates);
+    } catch (error) {
+        console.error("Get all candidates error:", error);
+        res.status(500).json({ error: "Failed to fetch all candidates" });
+    }
+});
+
 // POST add candidate (admin only)
 router.post("/", requireAdmin, async (req, res) => {
     try {
-        const { name, rollNumber, course, year, manifesto, imageUrl, photo } = req.body;
+        const { name, course, imageUrl, photo } = req.body;
 
-        if (!name || !rollNumber || !course || !year || !manifesto) {
-            return res.status(400).json({ error: "Missing required fields" });
+        if (!name || !course) {
+            return res.status(400).json({ error: "Missing required fields (Name or Department)" });
         }
 
         const candidate = await Candidate.create({
             name: name.trim(),
-            rollNumber: rollNumber.trim(),
             course: course.trim(),
-            year: year.trim(),
-            manifesto: manifesto.trim(),
             photo: (imageUrl || photo)?.trim() ||
                 "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400",
         });
 
+        console.log(`Candidate created: ${name}`);
         res.status(201).json(candidate);
     } catch (error) {
         console.error("Add candidate error:", error);
@@ -44,14 +53,11 @@ router.post("/", requireAdmin, async (req, res) => {
 // PUT update candidate (admin only)
 router.put("/:id", requireAdmin, async (req, res) => {
     try {
-        const { name, rollNumber, course, year, manifesto, imageUrl, photo, status } = req.body;
+        const { name, course, imageUrl, photo, status } = req.body;
 
         const updates = {};
         if (name) updates.name = name.trim();
-        if (rollNumber) updates.rollNumber = rollNumber.trim();
         if (course) updates.course = course.trim();
-        if (year) updates.year = year.trim();
-        if (manifesto) updates.manifesto = manifesto.trim();
         if (imageUrl || photo) updates.photo = (imageUrl || photo).trim();
         if (status) updates.status = status;
 

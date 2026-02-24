@@ -17,13 +17,13 @@ api.interceptors.request.use((config) => {
 
 export interface StudentLoginData {
     name: string;
-    rollNumber: string;
+    rollNumber: number;
     registerNumber: string;
     email: string;
 }
 
 export interface VerifyOtpData {
-    rollNumber: string;
+    registerNumber: string;
     otp: string;
 }
 
@@ -37,11 +37,15 @@ export const auth = {
     verifyOtp: (data: VerifyOtpData) => api.post('/auth/student/verify-otp', data),
     adminLogin: (data: AdminLoginData) => api.post('/auth/admin/login', data),
     adminForgotPassword: (email: string) => api.post('/auth/admin/forgot-password', { email }),
+    adminVerifyResetToken: (token: string) => api.get(`/auth/admin/reset-password/${token}`),
+    adminResetPassword: (token: string, password: string) => api.post('/auth/admin/reset-password', { token, password }),
 };
 
 export const candidates = {
     getAll: () => api.get('/candidates'),
+    getAllAdmin: () => api.get('/candidates/all'),
     add: (data: FormData | object) => api.post('/candidates', data),
+    update: (id: string, data: object) => api.put(`/candidates/${id}`, data),
     delete: (id: string) => api.delete(`/candidates/${id}`),
 };
 

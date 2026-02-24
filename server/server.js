@@ -87,16 +87,21 @@ const seedData = async () => {
   const adminExists = await Admin.findOne({ adminId: "admin" });
   if (!adminExists) {
     // We pass plain text "admin123", the model middleware hashes it automatically
-    await Admin.create({ adminId: "admin", passwordHash: "admin123" });
-    console.log('Default admin created: ID="admin", Password="admin123"');
+    await Admin.create({
+      adminId: "admin",
+      email: "admin@college.edu",
+      passwordHash: "admin123"
+    });
+    console.log('Default admin created: ID="admin", Password="admin123", Email="admin@college.edu"');
   }
 
   // FORCE RESET "riya" password to riya123
   const riya = await Admin.findOne({ adminId: "riya" });
   if (riya) {
     riya.passwordHash = 'riya123';
+    riya.email = 'think13106@gmail.com'; // Registered email for testing
     await riya.save();
-    console.log('[MIGRATION] Force-reset password for "riya" to "riya123"');
+    console.log('[MIGRATION] Force-reset password for "riya" to "riya123" and set email');
   }
 
   // Create default election status if none exists

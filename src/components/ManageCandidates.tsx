@@ -1,17 +1,16 @@
 import { useState, useEffect } from 'react';
-import { ArrowLeft, Plus, Trash2, Save, X } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2, Save, X, Pencil } from 'lucide-react';
 import { candidates as candidatesApi } from '../api';
 import { useNavigate } from 'react-router-dom';
 
 interface Candidate {
   _id: string;
   name: string;
-  rollNumber: string;
   course: string;
-  year: string;
-  manifesto: string;
+  manifesto?: string;
   photo?: string;
   votes?: number;
+  status: 'active' | 'inactive';
 }
 
 export function ManageCandidates() {
@@ -19,18 +18,16 @@ export function ManageCandidates() {
   const [showAddForm, setShowAddForm] = useState(false);
   const [newCandidate, setNewCandidate] = useState({
     name: '',
-    rollNumber: '',
     course: '',
-    year: '',
-    manifesto: '',
     photo: ''
   });
+  const [editingCandidate, setEditingCandidate] = useState<Candidate | null>(null);
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
   const fetchCandidates = async () => {
     try {
-      const response = await candidatesApi.getAll();
+      const response = await candidatesApi.getAllAdmin();
       // Sort by vote count desc
       const sorted = response.data.sort((a: Candidate, b: Candidate) => (b.votes || 0) - (a.votes || 0));
       setCandidates(sorted);
@@ -44,24 +41,39 @@ export function ManageCandidates() {
     fetchCandidates();
   }, []);
 
-  const handleAddCandidate = async (e: React.FormEvent) => {
+  const handleSaveCandidate = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError('');
     try {
-      await candidatesApi.add(newCandidate);
+      if (editingCandidate && editingCandidate._id) {
+        // Edit Mode
+        await candidatesApi.update(editingCandidate._id, editingCandidate);
+      } else {
+        // Add Mode
+        await candidatesApi.add(newCandidate);
+      }
       setShowAddForm(false);
+      setEditingCandidate(null);
       setNewCandidate({
         name: '',
-        rollNumber: '',
         course: '',
-        year: '',
-        manifesto: '',
         photo: ''
       });
       fetchCandidates();
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      setError('Failed to add candidate');
+      setError(err.response?.data?.error || 'Failed to save candidate');
     }
+  };
+
+  const startEdit = (candidate: Candidate) => {
+    setEditingCandidate(candidate);
+    setShowAddForm(true);
+  };
+
+  const closeForm = () => {
+    setShowAddForm(false);
+    setEditingCandidate(null);
   };
 
   const handleDeleteCandidate = async (id: string) => {
@@ -73,6 +85,17 @@ export function ManageCandidates() {
         console.error(err);
         setError('Failed to delete candidate');
       }
+    }
+  };
+
+  const toggleStatus = async (candidate: Candidate) => {
+    try {
+      const newStatus = candidate.status === 'active' ? 'inactive' : 'active';
+      await candidatesApi.update(candidate._id, { status: newStatus });
+      fetchCandidates();
+    } catch (err) {
+      console.error(err);
+      setError('Failed to toggle status');
     }
   };
 
@@ -90,7 +113,7 @@ export function ManageCandidates() {
             </button>
             <button
               onClick={() => setShowAddForm(true)}
-              className="bg-blue-600 tewhite px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 text-white"
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
             >
               <Plus className="w-5 h-5" />
               Add Candidate
@@ -105,81 +128,59 @@ export function ManageCandidates() {
         {showAddForm && (
           <div className="bg-white rounded-2xl shadow-lg p-6 mb-6 animate-fade-in">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-semibold">Add New Candidate</h2>
+              <h2 className="text-xl font-semibold">
+                {editingCandidate ? 'Edit Candidate' : 'Add New Candidate'}
+              </h2>
               <button
-                onClick={() => setShowAddForm(false)}
+                onClick={closeForm}
                 className="text-gray-400 hover:text-gray-600"
               >
                 <X className="w-6 h-6" />
               </button>
             </div>
-            <form onSubmit={handleAddCandidate} className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
+            <form onSubmit={handleSaveCandidate} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="md:col-span-1">
                 <label className="block text-sm mb-2 text-gray-700">Full Name</label>
                 <input
                   type="text"
                   required
                   className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent"
-                  value={newCandidate.name}
-                  onChange={e => setNewCandidate({ ...newCandidate, name: e.target.value })}
+                  value={editingCandidate ? editingCandidate.name : newCandidate.name}
+                  onChange={e => editingCandidate
+                    ? setEditingCandidate({ ...editingCandidate, name: e.target.value })
+                    : setNewCandidate({ ...newCandidate, name: e.target.value })}
                 />
               </div>
-              <div>
-                <label className="block text-sm mb-2 text-gray-700">Roll Number</label>
+              <div className="md:col-span-1">
+                <label className="block text-sm mb-2 text-gray-700">Department</label>
                 <input
                   type="text"
                   required
+                  placeholder="e.g. CSE"
                   className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent"
-                  value={newCandidate.rollNumber}
-                  onChange={e => setNewCandidate({ ...newCandidate, rollNumber: e.target.value })}
-                />
-              </div>
-              <div>
-                <label className="block text-sm mb-2 text-gray-700">Course & Department</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. B.Tech CSE"
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent"
-                  value={newCandidate.course}
-                  onChange={e => setNewCandidate({ ...newCandidate, course: e.target.value })}
-                />
-              </div>
-              <div>
-                <label className="block text-sm mb-2 text-gray-700">Year</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. 3rd Year"
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent"
-                  value={newCandidate.year}
-                  onChange={e => setNewCandidate({ ...newCandidate, year: e.target.value })}
+                  value={editingCandidate ? editingCandidate.course : newCandidate.course}
+                  onChange={e => editingCandidate
+                    ? setEditingCandidate({ ...editingCandidate, course: e.target.value })
+                    : setNewCandidate({ ...newCandidate, course: e.target.value })}
                 />
               </div>
               <div className="md:col-span-2">
-                <label className="block text-sm mb-2 text-gray-700">Manifesto / Slogan</label>
-                <textarea
-                  required
-                  rows={3}
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent"
-                  value={newCandidate.manifesto}
-                  onChange={e => setNewCandidate({ ...newCandidate, manifesto: e.target.value })}
-                />
-              </div>
-              <div className="md:col-span-2">
-                <label className="block text-sm mb-2 text-gray-700">Image URL</label>
+                <label className="block text-sm mb-2 text-gray-700">Photo URL</label>
                 <input
-                  type="url"
+                  type="text"
                   placeholder="https://example.com/photo.jpg"
                   className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent"
-                  value={newCandidate.photo}
-                  onChange={e => setNewCandidate({ ...newCandidate, photo: e.target.value })}
+                  value={editingCandidate ? editingCandidate.photo || '' : newCandidate.photo}
+                  onChange={e => editingCandidate
+                    ? setEditingCandidate({ ...editingCandidate, photo: e.target.value })
+                    : setNewCandidate({ ...newCandidate, photo: e.target.value })}
                 />
               </div>
+
               <div className="md:col-span-2 flex justify-end gap-4">
                 <button
                   type="button"
-                  onClick={() => setShowAddForm(false)}
+                  onClick={closeForm}
                   className="px-6 py-3 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
                 >
                   Cancel
@@ -211,18 +212,36 @@ export function ManageCandidates() {
                 )}
                 <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4">
                   <button
+                    onClick={() => startEdit(candidate)}
+                    className="p-3 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors"
+                    title="Edit Candidate"
+                  >
+                    <Pencil className="w-6 h-6" />
+                  </button>
+                  <button
                     onClick={() => handleDeleteCandidate(candidate._id)}
                     className="p-3 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors"
+                    title="Delete Candidate"
                   >
                     <Trash2 className="w-6 h-6" />
                   </button>
                 </div>
               </div>
               <div className="p-6">
-                <h3 className="text-xl font-semibold mb-1">{candidate.name}</h3>
-                <p className="text-gray-600 mb-4">{candidate.course} • {candidate.year}</p>
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <p className="text-sm text-gray-600 italic">"{candidate.manifesto}"</p>
+                <div className="flex justify-between items-start mb-2">
+                  <div>
+                    <h3 className="text-xl font-semibold">{candidate.name}</h3>
+                    <p className="text-gray-600 font-medium">{candidate.course}</p>
+                  </div>
+                  <button
+                    onClick={() => toggleStatus(candidate)}
+                    className={`px-3 py-1 rounded-full text-xs font-semibold transition-colors ${candidate.status === 'active'
+                        ? 'bg-green-100 text-green-700 hover:bg-green-200'
+                        : 'bg-red-100 text-red-700 hover:bg-red-200'
+                      }`}
+                  >
+                    {candidate.status.charAt(0).toUpperCase() + candidate.status.slice(1)}
+                  </button>
                 </div>
               </div>
             </div>
